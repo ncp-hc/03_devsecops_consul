@@ -1,8 +1,9 @@
 # 03_devsecops_consul
 DevSecOps X MultiCloud 위한 시나리오
 
+## 1) DevSecOps on Naver Cloud Platform
 
-## Consul (HashiCorp)
+## 2) Consul for MultiCloud (HashiCorp)
 
 > 두 Kubernetes 환경을 컨트롤하므로 실행에 주의가 필요합니다.
 > Consul helm github : https://github.com/hashicorp/consul-helm
