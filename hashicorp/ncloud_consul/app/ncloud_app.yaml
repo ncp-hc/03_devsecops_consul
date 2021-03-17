@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dashboard-http
+
+spec:
+  selector:
+    matchLabels:
+      app: dashboard-http
+  template:
+    metadata:
+      annotations:
+        # 'consul.hashicorp.com/service-tags': servicemesh, consul, dashboard-ui, v1
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9102"
+        consul.hashicorp.com/connect-inject: 'true'
+        consul.hashicorp.com/connect-service: 'dashboard-http'
+        consul.hashicorp.com/connect-service-upstreams: 'counting:9001:dc-gcp'
+      labels:
+        app: dashboard-http
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: dashboard-http
+        image: hashicorp/dashboard-service:0.0.4
+        ports:
+        - containerPort: 9002
+          name: http
+        env:
+        - name: COUNTING_SERVICE_URL
+          value: 'http://localhost:9001'
+        # - name: DISABLE_TRACING
+        #   value: "1"
+        resources:
+          requests:
+            cpu: 200m
+            memory: 128Mi
+          limits:
+            cpu: 400m
+            memory: 256Mi

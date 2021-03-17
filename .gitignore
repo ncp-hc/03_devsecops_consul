@@ -1,0 +1,10 @@
+**/Icon
+
+**/.terraform
+**/*.tfstate
+**/*.backup
+**/*.tfvars
+
+**/kubeconfig*.yaml
+**/consul-federation-secret.yaml
+**/*.pem

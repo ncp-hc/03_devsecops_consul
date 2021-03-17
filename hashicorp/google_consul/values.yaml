@@ -1,0 +1,61 @@
+global:
+  name: consul
+  #image: "consul:1.9.3"
+  #imageEnvoy: "envoyproxy/envoy-alpine:v1.15-latest"
+  imageK8S: "hashicorp/consul-k8s:0.24.0"
+  datacenter: dc-GCP
+  tls:
+   # TLS must be enabled for federation in Kubernetes.
+    enabled: true
+    verify: false
+    httpsOnly: false
+
+    # Here we're using the shared certificate authority from the primary
+    # datacenter that was exported via the federation secret.
+    caCert:
+      secretName: consul-federation
+      secretKey: caCert
+    caKey:
+      secretName: consul-federation
+      secretKey: caKey
+
+  federation:
+    enabled: true
+  gossipEncryption:
+    secretName: consul-federation
+    secretKey: gossipEncryptionKey
+
+ui:
+  service:
+    type: LoadBalancer
+
+connectInject:
+  enabled: true
+
+dns:
+  enabled: true
+
+
+server:
+  # Here we're including the server config exported from the primary
+  # via the federation secret. This config includes the addresses of
+  # the primary datacenter's mesh gateways so Consul can begin federation.
+  extraVolumes:
+    - type: secret
+      name: consul-federation
+      items:
+        - key: serverConfigJSON
+          path: config.json
+      load: true
+
+meshGateway:
+  enabled: true
+
+controller:
+  enabled: true
+
+terminatingGateways:
+  enabled: true
+  gateways:
+    - name: external-services
+

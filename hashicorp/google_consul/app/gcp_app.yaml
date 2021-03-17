@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: counting
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: counting
+  template:
+    metadata:
+      annotations:
+        'consul.hashicorp.com/service-tags': servicemesh, consul, counting, v1
+        'consul.hashicorp.com/connect-inject': 'true'
+        'consul.hashicorp.com/connect-service': 'counting'
+      labels:
+        app: counting
+    spec:
+      terminationGracePeriodSeconds: 5
+      containers:
+      - name: counting
+        image: hashicorp/counting-service:0.0.2
+        ports:
+        - containerPort: 9001
+          name: http
+        env:
+        - name: PORT
+          value: "9001"
+        # - name: DISABLE_TRACING
+        #   value: "1"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: counting
+spec:
+  type: ClusterIP
+  selector:
+    app: counting
+  ports:
+  - protocol: TCP
+    port: 9001
+    targetPort: 9001
+---
+

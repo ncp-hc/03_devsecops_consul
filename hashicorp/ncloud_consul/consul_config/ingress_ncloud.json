@@ -1,0 +1,15 @@
+{
+  "Kind": "ingress-gateway",
+  "Name": "ingress-gateway",
+  "Listeners": [
+    {
+      "Port": 9002,
+      "Protocol": "tcp",
+      "Services": [
+        {
+          "Name": "dashboard-http"
+        }
+      ]
+    }
+  ]
+}

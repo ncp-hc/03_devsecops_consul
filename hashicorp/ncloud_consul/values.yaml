@@ -1,0 +1,89 @@
+global:
+  name: consul
+  #image: "consul:1.9.3"
+  #imageEnvoy: "envoyproxy/envoy-alpine:v1.15.2"
+  imageK8S: "hashicorp/consul-k8s:0.24.0"
+  datacenter: dc-NCLOUD
+
+  # TLS configures whether Consul components use TLS.
+  tls:
+    # TLS must be enabled for federation in Kubernetes.
+    enabled: true
+    verify: false
+    httpsOnly: false
+
+  federation:
+    enabled: true
+    # This will cause a Kubernetes secret to be created that
+    # can be imported by secondary datacenters to configure them
+    # for federation.
+    createFederationSecret: true
+
+
+  # Gossip encryption secures the protocol Consul uses to quickly
+  # discover new nodes and detect failure.
+  gossipEncryption:
+    secretName: consul-gossip-encryption-key
+    secretKey: key
+
+server:
+  disruptionBudget:
+    enabled: true
+    maxUnavailable: 0
+  extraConfig: |
+    {
+      "ui_config": {
+        "enabled": true,
+        "metrics_provider": "prometheus",
+        "metrics_proxy": {
+          "base_url": "http://prometheus-server"
+        }
+      }
+    }
+
+client:
+  enabled: true
+  # enable gRPC on your client to support Consul service mesh
+  grpc: true
+  hostNetwork: true
+  dnsPolicy: ClusterFirstWithHostNet
+
+ui:
+  service:
+    type: LoadBalancer
+
+controller:
+  enabled: true
+
+connectInject:
+  # Consul Connect service mesh must be enabled for federation.
+  enabled: true
+  # inject an envoy sidecar into every new pod, except for those with annotations that prevent injection
+  default: true
+
+dns:
+  enabled: true
+  type: ClusterIP
+
+meshGateway:
+  # Mesh gateways are gateways between datacenters. They must be enabled
+  # for federation in Kubernetes since the communication between datacenters
+  # goes through the mesh gateways.
+  enabled: true
+
+
+ingressGateways:
+  enabled: true
+  gateways:
+    - name: ingress-gateway
+      service:
+        type: LoadBalancer
+        ports:
+          - port: 5000
+          - port: 8080
+          - port: 9002
+
+terminatingGateways:
+  enabled: true
+  gateways:
+    - name: external-services

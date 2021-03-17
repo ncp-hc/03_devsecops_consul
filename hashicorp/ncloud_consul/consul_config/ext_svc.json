@@ -1,0 +1,17 @@
+{
+  "ID": "mysql",
+  "Name": "mysql",
+  "Tags": ["rds", "aws"],
+  "Address": "db-5sv3f.vpc-cdb.ntruss.com",
+  "Port": 3306,
+  "Meta": {
+    "mysql_version": "5.7"
+  },
+  "EnableTagOverride": true,
+  "Check": {
+    "name": "tcp on port 3306",
+    "tcp": "db-5sv3f.vpc-cdb.ntruss.com:3306",
+    "interval": "10s",
+    "timeout": "1s"
+  }
+}
